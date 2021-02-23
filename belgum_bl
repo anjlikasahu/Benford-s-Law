@@ -1,0 +1,175 @@
+import pandas as pd
+from math import log
+from collections import Counter
+import math
+
+loc = r"C:\\Users\\ANJLIKA\\Desktop\\belgum.csv"  # location of our source dataset
+df = pd.read_csv(loc, encoding='latin1')
+
+amount = list(df['Credit']) 
+
+first_digit = list()
+benford = list()
+digit = list()
+count = list()  # list containing the count of digits from 1-9 in original dataset
+for amt in amount:
+    if (len(str(amt))>0):
+        first_digit.append(str(amt)[0])
+
+for d in range(1, 10):
+    digit.append(d)
+    benford.append((log(d + 1, 10) - log(d, 10)))
+
+for value in sorted(Counter(first_digit)):
+    count.append(Counter(first_digit)[value])
+size = len(df)  # totals rows in our dataset
+Z_value = 1.96  # Z Value for 95% confidence
+
+upper_limit = list()  # list having acceptable upper limit for our distribution
+lower_limit = list()  # list having acceptable lower limit for our distribution
+
+frequency = list()  # list having the actual distribution of all the digits from original dataset
+deviation = list()
+
+for x in range(len(digit)):
+    if (count[x] != 0):
+        calc = benford[x] + (Z_value) * (math.sqrt(benford[x] * (1 - benford[x]) / size)) + 1 / (2 * size)
+        upper_limit.append(calc)
+        calc = benford[x] - (Z_value) * (math.sqrt(benford[x] * (1 - benford[x]) / size)) - 1 / (2 * size)
+        lower_limit.append(calc)
+        frequency.append((count[x] / size))
+    else:
+        upper_limit.append(0)
+        lower_limit.append(0)
+        frequency.append(0)
+
+for x in range(len(digit)):
+    if (frequency[x] != 0):
+        value = benford[x] - frequency[x]
+        deviation.append(value)
+    else:
+        deviation.append(0)
+
+# making a datafram from al the lists we calculated fro digits from 1-9 above
+final_data = pd.DataFrame(list(zip(digit, benford, upper_limit, lower_limit, frequency, deviation)),
+                          columns=['First Digit', 'Benford Dist', 'Upper Limit', 'Lower Limit', 'Frequency',
+                                   'Deviation'])
+
+print(final_data) #highest deviations found for first digit as 1 
+print("\n")
+
+#For first digit as "1":
+first_digit_1 = list()
+for amt in amount:
+    if (str(amt)[0] == '1' and len(str(amt)) > 1):
+        first_digit_1.append(str(amt)[1])
+benford_1 = list()
+digit1 = list()
+for d in range(0, 10):
+    digit1.append(d)
+    a = log(10 * 1 + d + 1) - log(10 * 1 + d) #here 1 because we are studying when First digit is '1'
+    benford_1.append(a)
+count_1 = list()
+for value in sorted(Counter(first_digit_1)):
+    count_1.append(Counter(first_digit_1)[value])
+
+upper_limit_1 = list()  # list having acceptable upper limit for our distribution
+lower_limit_1 = list()  # list having acceptable lower limit for our distribution
+
+frequency_1 = list()
+deviation_1 = list()
+
+for x in range(len(digit1)):
+    if (count_1[x] != 0):
+        calc = benford_1[x] + (Z_value) * (math.sqrt(benford_1[x] * (1 - benford_1[x]) / size)) + 1 / (2 * size)
+        upper_limit_1.append(calc)
+        calc = benford_1[x] - (Z_value) * (math.sqrt(benford_1[x] * (1 - benford_1[x]) / size)) - 1 / (2 * size)
+        lower_limit_1.append(calc)
+        frequency_1.append((count_1[x] / size))
+    else:
+        upper_limit_1.append(0)
+        lower_limit_1.append(0)
+        frequency_1.append(0)
+
+for x in range(len(digit1)):
+    if (frequency_1[x] != 0):
+        value = benford_1[x] - frequency_1[x]
+        deviation_1.append(value)
+    else:
+        deviation_1.append(0)
+
+# making a datafram from al the lists we calculated from digits from 1-9 above
+final_data_1 = pd.DataFrame(list(zip(digit1, benford_1, upper_limit_1, lower_limit_1, frequency_1, deviation_1)),
+                            columns=['Second Digit', 'Benford Dist', 'Upper Limit', 'Lower Limit', 'Frequency',
+                                     'Deviation'])
+print(final_data_1) #Here, highest deviations found for second digit as '1'
+print("\n")
+
+first_digit_11 = list()
+for amt in amount:
+    if (len(str(amt)) > 2 and str(amt)[0] == '1' and str(amt)[1] == '1'):
+        first_digit_11.append(str(amt)[2])
+benford_11 = list()
+for d in range(0, 10):
+    a = log(10 * 11 + d + 1) - log(10 * 11 + d) # "11" because we have chosen first two digits as 11
+    benford_11.append(a)
+
+count_11 = list()
+
+for value in sorted(Counter(first_digit_11)):
+    count_11.append(Counter(first_digit_11)[value])
+
+#count_10.insert(9, 0)
+
+upper_limit_11 = list()  # list having acceptable upper limit for our distribution
+lower_limit_11 = list()  # list having acceptable lower limit for our distribution
+
+frequency_11 = list()
+deviation_11 = list()
+
+for x in range(len(digit1)):
+    if (count_11[x] != 0):
+        calc = benford_11[x] + (Z_value) * (math.sqrt(benford_11[x] * (1 - benford_11[x]) / size)) + 1 / (2 * size)
+        upper_limit_11.append(calc)
+        calc = benford_11[x] - (Z_value) * (math.sqrt(benford_11[x] * (1 - benford_11[x]) / size)) - 1 / (2 * size)
+        lower_limit_11.append(calc)
+        frequency_11.append((count_11[x] / size))
+    else:
+        upper_limit_11.append(0)
+        lower_limit_11.append(0)
+        frequency_11.append(0)
+
+for x in range(len(digit1)):
+    if (frequency_11[x] != 0):
+        value = benford_11[x] - frequency_11[x]
+        deviation_11.append(value)
+    else:
+        deviation_11.append(0)
+
+final_data_11 = pd.DataFrame(list(zip(digit1, benford_11, upper_limit_11, lower_limit_11, frequency_11, deviation_11)),
+                             columns=['Third Digit', 'Benford Dist', 'Upper Limit', 'Lower Limit', 'Frequency',
+                                      'Deviation'])
+print(final_data_11) #115 and 117
+print("\n")
+
+
+
+Third = list()
+anomaly = list()
+for amt in amount:
+    if (len(str(amt)) > 2):
+        b = str(amt)[0] + str(amt)[1] + str(amt)[2]
+        Third.append(b)
+    else:
+        Third.append(amt)
+df['First_Three'] = Third
+
+for a in Third:
+    if(a == '117' or a == '115'):
+        anomaly.append('YES')
+    else:
+        anomaly.append('NO')
+
+df['Anomaly(Y/N)'] = anomaly
+
+
